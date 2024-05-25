@@ -1,3 +1,5 @@
+package ru.yandex.javacource.isaev.schedule.task;
+
 import java.util.Objects;
 
 public class Task {
@@ -8,6 +10,12 @@ public class Task {
 
     public Task(int id, String title, String description, Status status) {
         this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+
+    public Task(String title, String description, Status status) {
         this.title = title;
         this.description = description;
         this.status = status;

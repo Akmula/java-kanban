@@ -1,3 +1,5 @@
+package ru.yandex.javacource.isaev.schedule.task;
+
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -5,6 +7,11 @@ public class SubTask extends Task {
 
     public SubTask(int id, int epicId, String title, String description, Status status) {
         super(id, title, description, status);
+        this.epicId = epicId;
+    }
+
+    public SubTask(int epicId, String title, String description, Status status) {
+        super(title, description, status);
         this.epicId = epicId;
     }
 
