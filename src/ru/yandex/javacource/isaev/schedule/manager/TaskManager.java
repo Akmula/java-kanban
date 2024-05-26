@@ -71,7 +71,6 @@ public class TaskManager {
         }
         savedEpic.setTitle(epic.getTitle());
         savedEpic.setDescription(epic.getDescription());
-        updateEpicStatus(id);
         return savedEpic;
     }
 
