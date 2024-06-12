@@ -1,6 +1,9 @@
 package ru.yandex.javacource.isaev.schedule;
 
-import ru.yandex.javacource.isaev.schedule.manager.TaskManager;
+import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
+import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
+import ru.yandex.javacource.isaev.schedule.manager.InMemoryHistoryManager;
+import ru.yandex.javacource.isaev.schedule.manager.Managers;
 import ru.yandex.javacource.isaev.schedule.task.Epic;
 import ru.yandex.javacource.isaev.schedule.task.Status;
 import ru.yandex.javacource.isaev.schedule.task.SubTask;
@@ -9,7 +12,7 @@ import ru.yandex.javacource.isaev.schedule.task.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         // добавление задач
         System.out.println();
@@ -18,6 +21,7 @@ public class Main {
         System.out.print("Добавлена задача = " + taskManager.addTask(task1));
         Task task2 = new Task("Задача номер 2", "Создать задачу 2", Status.NEW);
         System.out.println("Добавлена задача = " + taskManager.addTask(task2));
+        taskManager.getTask(task1.getId()); // добавляем в историю просмотра
 
         // добавление эпиков
         System.out.println("Добавление эпиков!");
@@ -25,6 +29,7 @@ public class Main {
         System.out.print("Добавлен эпик = " + taskManager.addEpic(epic1));
         Epic epic2 = new Epic("Эпик 2", "Создать эпик 2 с двумя подзадачами", Status.NEW);
         System.out.println("Добавлен эпик = " + taskManager.addEpic(epic2));
+        taskManager.getEpic(epic1.getId()); // добавляем в историю просмотра
 
         // добавление подзадач
         System.out.println("Добавление подзадач!");
@@ -37,6 +42,7 @@ public class Main {
         SubTask subTask3 = new SubTask(epic2.getId(), "Подзадача 3", "Создать подзадачу 3", Status.NEW);
         taskManager.addSubTask(subTask3);
         System.out.println("Добавлена подзадача = " + subTask3);
+        taskManager.getSubTask(subTask2.getId()); // добавляем в историю просмотра
 
         // просмотр всех задач
         System.out.println("Текущие задачи: \n" + taskManager.getTaskList());
@@ -49,16 +55,19 @@ public class Main {
                 task1.setDescription("Изменение задач!"), task1.getStatus());
         taskManager.updateTask(task1update);
         System.out.println("Задача изменена = " + task1update);
+        taskManager.getTask(task1update.getId()); // добавляем в историю просмотра
 
         // изменение эпиков
         System.out.println("Изменение эпиков!");
         epic1.setDescription("Изменение эпиков!");
         System.out.println("Эпик изменен = " + epic1);
+        taskManager.getEpic(epic1.getId()); // добавляем в историю просмотра
 
         // изменение подзадач
         System.out.println("Изменение подзадач!");
         subTask2.setDescription("Изменение подзадач!");
         System.out.println("Подзадача изменена = " + subTask2);
+        taskManager.getSubTask(subTask2.getId()); // добавляем в историю просмотра
 
         // изменение статусов
         System.out.println("Изменение статусов!");
@@ -73,6 +82,7 @@ public class Main {
                 "! Статус должен быть - NEW.");
         taskManager.updateSubTask(subTask2Update);
         System.out.println("Статус подзадачи изменен на: " + subTask2Update);
+        taskManager.getEpic(epic1Update.getId()); // добавляем в историю просмотра
 
         // удаление задач
         System.out.println("Удаление задач!");
@@ -93,5 +103,8 @@ public class Main {
         System.out.println("Текущие задачи: \n" + taskManager.getTaskList());
         System.out.println("Текущие эпики: \n" + taskManager.getEpicList());
         System.out.println("Текущие подзадачи: \n" + taskManager.getSubTaskList());
+
+        // просмотр истории
+        System.out.println("Просмотренные задачи: \n" + taskManager.getHistory());
     }
 }

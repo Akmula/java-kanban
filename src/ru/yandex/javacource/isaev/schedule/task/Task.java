@@ -50,9 +50,8 @@ public class Task {
         return status;
     }
 
-    public Status setStatus(Status status) {
+    public void setStatus(Status status) {
         this.status = status;
-        return status;
     }
 
     @Override
