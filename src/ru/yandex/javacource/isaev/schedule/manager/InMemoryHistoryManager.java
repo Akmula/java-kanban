@@ -8,10 +8,14 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> historyTasks = new ArrayList<>(); // список истории
+    public static final int MAX_SIZE = 10; // размер списка истории
 
     @Override
     public void add(Task task) {
-        if (historyTasks.size() >= 10) {
+        if(task == null) {
+            return;
+        }
+        if (historyTasks.size() >= MAX_SIZE) {
             historyTasks.remove(0);
         }
         historyTasks.add(task);

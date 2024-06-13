@@ -1,25 +1,26 @@
 package ru.yandex.javacource.isaev.schedule.task;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subTaskIds;
+    private List<Integer> subTaskIds;
 
     public Epic(String title, String description, Status status) {
         super(title, description, status);
     }
 
-    public Epic(int id, ArrayList<Integer> subTaskIds, String title, String description, Status status) {
+    public Epic(int id, List<Integer> subTaskIds, String title, String description, Status status) {
         super(id, title, description, status);
         this.subTaskIds = subTaskIds;
     }
 
-    public ArrayList<Integer> getSubTaskId() {
+    public List<Integer> getSubTaskId() {
         return subTaskIds;
     }
 
-    public void setSubTaskId(ArrayList<Integer> subTaskIds) {
+    public void setSubTaskId(List<Integer> subTaskIds) {
         this.subTaskIds = subTaskIds;
     }
 

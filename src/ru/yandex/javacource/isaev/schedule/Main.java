@@ -52,20 +52,20 @@ public class Main {
         //изменение задач
         System.out.println("Изменение задач!");
         Task task1update = new Task(task1.getId(), task1.getTitle(),
-                task1.setDescription("Изменение задач!"), task1.getStatus());
+                task1.setDescription("Изменение описания задачи"), task1.getStatus());
         taskManager.updateTask(task1update);
         System.out.println("Задача изменена = " + task1update);
         taskManager.getTask(task1update.getId()); // добавляем в историю просмотра
 
         // изменение эпиков
         System.out.println("Изменение эпиков!");
-        epic1.setDescription("Изменение эпиков!");
+        epic1.setDescription("Изменение описания эпика!");
         System.out.println("Эпик изменен = " + epic1);
         taskManager.getEpic(epic1.getId()); // добавляем в историю просмотра
 
         // изменение подзадач
         System.out.println("Изменение подзадач!");
-        subTask2.setDescription("Изменение подзадач!");
+        subTask2.setDescription("Изменение описания подзадачи!");
         System.out.println("Подзадача изменена = " + subTask2);
         taskManager.getSubTask(subTask2.getId()); // добавляем в историю просмотра
 
@@ -77,11 +77,12 @@ public class Main {
         SubTask subTask2Update = new SubTask(subTask2.getId(), subTask2.getEpicId(),
                 subTask2.getTitle(), subTask2.getDescription(), Status.DONE);
         taskManager.updateTask(task1Update);
-        System.out.println("Статус задачи изменен на: " + task1Update);
-        System.out.println("Статус эпика изменен на: " + taskManager.updateEpic(epic1Update) +
+        System.out.println("Статус задачи изменен на DONE: " + task1Update);
+        taskManager.updateEpic(epic1Update);
+        System.out.println("Статус эпика изменен на DONE: " + epic1Update +
                 "! Статус должен быть - NEW.");
         taskManager.updateSubTask(subTask2Update);
-        System.out.println("Статус подзадачи изменен на: " + subTask2Update);
+        System.out.println("Статус подзадачи изменен на DONE: " + subTask2Update);
         taskManager.getEpic(epic1Update.getId()); // добавляем в историю просмотра
 
         // удаление задач
