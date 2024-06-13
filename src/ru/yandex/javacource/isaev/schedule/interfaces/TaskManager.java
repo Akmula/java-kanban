@@ -23,7 +23,7 @@ public interface TaskManager {
 
     Epic addEpic(Epic epic);
 
-    Epic updateEpic(Epic epic);
+    void updateEpic(Epic epic);
 
     void deleteEpic(int id);
 

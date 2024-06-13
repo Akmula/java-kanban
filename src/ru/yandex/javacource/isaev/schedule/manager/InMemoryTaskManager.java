@@ -56,11 +56,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(int id) { // получение задачи по идентификатору
-        Task saveHistory = tasks.get(id);
-        Task history = new Task(saveHistory.getId(), saveHistory.getTitle(),
-                saveHistory.getDescription(), saveHistory.getStatus());
-        historyManager.add(history);
-        return tasks.get(id);
+        final Task task = tasks.get(id);
+        historyManager.add(task);
+        return task;
     }
 
     // методы для эпиков
@@ -79,15 +77,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic updateEpic(Epic epic) { // обновление эпика
-        int id = epic.getId();
-        Epic savedEpic = epics.get(id);
+    public void updateEpic(Epic epic) { // обновление эпика
+        final Epic savedEpic = epics.get(epic.getId());
         if (savedEpic == null) {
-            return null;
+            return;
         }
-        savedEpic.setTitle(epic.getTitle());
-        savedEpic.setDescription(epic.getDescription());
-        return savedEpic;
+        epic.setSubTaskId(savedEpic.getSubTaskId());
+        epic.setStatus(savedEpic.getStatus());
+        epics.put(epic.getId(), epic);
     }
 
     @Override
@@ -109,11 +106,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpic(int id) { // получение эпика по идентификатору.
-        Epic saveHistory = epics.get(id);
-        Epic history = new Epic(saveHistory.getId(), saveHistory.getSubTaskId(), saveHistory.getTitle(),
-                saveHistory.getDescription(), saveHistory.getStatus());
-        historyManager.add(history);
-        return epics.get(id);
+        final Epic epic = epics.get(id);
+        historyManager.add(epic);
+        return epic;
     }
 
     // методы для подзадач
@@ -175,11 +170,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTask(int id) { //получение подзадачи по id
-        SubTask saveHistory = subTasks.get(id);
-        SubTask history = new SubTask(saveHistory.getId(), saveHistory.getEpicId(), saveHistory.getTitle(),
-                saveHistory.getDescription(), saveHistory.getStatus());
-        historyManager.add(history);
-        return subTasks.get(id);
+        final SubTask subTask = subTasks.get(id);
+        historyManager.add(subTask);
+        return subTask;
     }
 
     @Override
