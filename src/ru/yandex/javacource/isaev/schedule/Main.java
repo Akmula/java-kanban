@@ -1,8 +1,6 @@
 package ru.yandex.javacource.isaev.schedule;
 
-import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
-import ru.yandex.javacource.isaev.schedule.manager.InMemoryHistoryManager;
 import ru.yandex.javacource.isaev.schedule.manager.Managers;
 import ru.yandex.javacource.isaev.schedule.task.Epic;
 import ru.yandex.javacource.isaev.schedule.task.Status;
@@ -21,7 +19,6 @@ public class Main {
         System.out.print("Добавлена задача = " + taskManager.addTask(task1));
         Task task2 = new Task("Задача номер 2", "Создать задачу 2", Status.NEW);
         System.out.println("Добавлена задача = " + taskManager.addTask(task2));
-        taskManager.getTask(task1.getId()); // добавляем в историю просмотра
 
         // добавление эпиков
         System.out.println("Добавление эпиков!");
@@ -29,7 +26,6 @@ public class Main {
         System.out.print("Добавлен эпик = " + taskManager.addEpic(epic1));
         Epic epic2 = new Epic("Эпик 2", "Создать эпик 2 с двумя подзадачами", Status.NEW);
         System.out.println("Добавлен эпик = " + taskManager.addEpic(epic2));
-        taskManager.getEpic(epic1.getId()); // добавляем в историю просмотра
 
         // добавление подзадач
         System.out.println("Добавление подзадач!");
@@ -42,7 +38,6 @@ public class Main {
         SubTask subTask3 = new SubTask(epic2.getId(), "Подзадача 3", "Создать подзадачу 3", Status.NEW);
         taskManager.addSubTask(subTask3);
         System.out.println("Добавлена подзадача = " + subTask3);
-        taskManager.getSubTask(subTask2.getId()); // добавляем в историю просмотра
 
         // просмотр всех задач
         System.out.println("Текущие задачи: \n" + taskManager.getTaskList());
@@ -55,19 +50,16 @@ public class Main {
                 task1.setDescription("Изменение описания задачи"), task1.getStatus());
         taskManager.updateTask(task1update);
         System.out.println("Задача изменена = " + task1update);
-        taskManager.getTask(task1update.getId()); // добавляем в историю просмотра
 
         // изменение эпиков
         System.out.println("Изменение эпиков!");
         epic1.setDescription("Изменение описания эпика!");
         System.out.println("Эпик изменен = " + epic1);
-        taskManager.getEpic(epic1.getId()); // добавляем в историю просмотра
 
         // изменение подзадач
         System.out.println("Изменение подзадач!");
         subTask2.setDescription("Изменение описания подзадачи!");
         System.out.println("Подзадача изменена = " + subTask2);
-        taskManager.getSubTask(subTask2.getId()); // добавляем в историю просмотра
 
         // изменение статусов
         System.out.println("Изменение статусов!");
@@ -83,7 +75,6 @@ public class Main {
                 "! Статус должен быть - NEW.");
         taskManager.updateSubTask(subTask2Update);
         System.out.println("Статус подзадачи изменен на DONE: " + subTask2Update);
-        taskManager.getEpic(epic1Update.getId()); // добавляем в историю просмотра
 
         // удаление задач
         System.out.println("Удаление задач!");
@@ -106,6 +97,65 @@ public class Main {
         System.out.println("Текущие подзадачи: \n" + taskManager.getSubTaskList());
 
         // просмотр истории
+        taskManager.getEpic(4); // перезаписывается
+        taskManager.getTask(2); // перезаписывается
+        taskManager.getSubTask(6); // перезаписывается
+        taskManager.getEpic(4); // перезаписывается
+        taskManager.getSubTask(6); // добавляем в историю просмотра
+        taskManager.getEpic(4); // перезаписывается
+        taskManager.getTask(2); // перезаписывается
+        taskManager.getEpic(4); // добавляем в историю просмотра
+        taskManager.getTask(2); // добавляем в историю просмотра
         System.out.println("Просмотренные задачи: \n" + taskManager.getHistory());
+
+        //дополнительное задание
+        taskManager.deleteAllTask();
+        taskManager.deleteAllEpic();
+
+        Task id8 = new Task("Задача номер 1", "дополнительное задание", Status.NEW);
+        Task id9 = new Task("Задача номер 2", "дополнительное задание", Status.NEW);
+        Epic id10 = new Epic("Эпик 1", "дополнительное задание", Status.NEW);
+        Epic id11 = new Epic("Эпик 2", "дополнительное задание", Status.NEW);
+        SubTask id12 = new SubTask(10, "Подзадача 1", "дополнительное задание", Status.NEW);
+        SubTask id13 = new SubTask(10, "Подзадача 2", "дополнительное задание", Status.NEW);
+        SubTask id14 = new SubTask(10, "Подзадача 3", "дополнительное задание", Status.NEW);
+        taskManager.addTask(id8);
+        taskManager.addTask(id9);
+        taskManager.addEpic(id10);
+        taskManager.addEpic(id11);
+        taskManager.addSubTask(id12);
+        taskManager.addSubTask(id13);
+        taskManager.addSubTask(id14);
+        taskManager.getTask(8);
+        taskManager.getTask(9);
+        taskManager.getEpic(10);
+        taskManager.getEpic(11);
+        taskManager.getSubTask(12);
+        taskManager.getSubTask(13);
+        taskManager.getSubTask(14);
+
+        // первоначальная история
+        System.out.println("Изначальная история: \n" + taskManager.getHistory());
+        taskManager.getSubTask(13);
+        System.out.println("Подзадача 2 выведется последней.");
+        System.out.println(taskManager.getHistory());
+        taskManager.getSubTask(12);
+        System.out.println("Подзадача 1 выведется последней.");
+        System.out.println(taskManager.getHistory());
+        taskManager.getEpic(11);
+        System.out.println("Эпик 2 выведется последним.");
+        System.out.println(taskManager.getHistory());
+        taskManager.getTask(8);
+        System.out.println("Задача 1 выведется последней.");
+        System.out.println(taskManager.getHistory());
+        taskManager.getSubTask(14);
+        System.out.println("Подзадача 3 выведется последней.");
+        System.out.println(taskManager.getHistory());
+        taskManager.deleteTask(9);
+        System.out.println("Задача 2 удалена.");
+        System.out.println(taskManager.getHistory());
+        taskManager.deleteEpic(10);
+        System.out.println("Эпик 1 удален. Его подзадачи тоже.");
+        System.out.println(taskManager.getHistory());
     }
 }
