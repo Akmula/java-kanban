@@ -2,8 +2,8 @@ package ru.yandex.javacource.isaev.schedule.manager;
 
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
-import ru.yandex.javacource.isaev.schedule.task.Status;
 import ru.yandex.javacource.isaev.schedule.task.Epic;
+import ru.yandex.javacource.isaev.schedule.task.Status;
 import ru.yandex.javacource.isaev.schedule.task.SubTask;
 import ru.yandex.javacource.isaev.schedule.task.Task;
 
@@ -45,12 +45,16 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(int id) { //
+    public void deleteTask(int id) { // удаление задачи
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
     public void deleteAllTask() { // удаление всех задач
+        for (int id : tasks.keySet()) {
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
 
@@ -89,17 +93,28 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpic(int id) { // удаление эпика
+        historyManager.remove(id);
         Epic epic = epics.remove(id);
         if (epic == null) {
             return;
         }
+        if (epic.getSubTaskId() == null) {
+            return;
+        }
         for (Integer subTaskId : epic.getSubTaskId()) {
+            historyManager.remove(subTaskId);
             subTasks.remove(subTaskId);
         }
     }
 
     @Override
     public void deleteAllEpic() { // удаление всех эпиков.
+        for (int id : epics.keySet()) {
+            historyManager.remove(id);
+        }
+        for (int id : subTasks.keySet()) {
+            historyManager.remove(id);
+        }
         epics.clear();
         subTasks.clear(); //так как подзадачи не могут существовать без эпиков, их тоже удаляем
     }
@@ -150,6 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTask(int id) { // удаление подзадачи
+        historyManager.remove(id);
         SubTask subTask = subTasks.remove(id);
         if (subTask == null) {
             return;
@@ -164,6 +180,9 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             epic.cleanSubTaskIds();
             updateEpicStatus(epic.getId());
+        }
+        for (int id : subTasks.keySet()) {
+            historyManager.remove(id);
         }
         subTasks.clear();
     }
