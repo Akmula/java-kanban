@@ -1,17 +1,18 @@
-package ru.yandex.javacource.isaev.schedule.manager;
+package ru.yandex.javacource.isaev.schedule.managers;
 
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
-import ru.yandex.javacource.isaev.schedule.task.Epic;
-import ru.yandex.javacource.isaev.schedule.task.Status;
-import ru.yandex.javacource.isaev.schedule.task.SubTask;
-import ru.yandex.javacource.isaev.schedule.task.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.Epic;
+import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
+import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.yandex.javacource.isaev.schedule.task.Status.*;
+import static ru.yandex.javacource.isaev.schedule.enums.Status.*;
 
 class InMemoryTaskManagerTest {
 
@@ -69,14 +70,16 @@ class InMemoryTaskManagerTest {
     //  проверьте, что InMemoryTaskManager действительно добавляет задачи разного типа и может найти их по id
     @Test
     void testInMemoryTaskManager() {
-        taskManager.addTask(new Task("Задача", "Тестовая задача", NEW));
+        Task task = new Task("Задача", "Тестовая задача", NEW);
+        taskManager.addTask(task);
         Epic epic = new Epic("Эпик", "Тестовый эпик", NEW);
         taskManager.addEpic(epic);
-        taskManager.addSubTask(new SubTask(epic.getId(), "Подзадача", "Тестовая подзадача", NEW));
+        SubTask subTask = new SubTask("Подзадача", "Тестовая подзадача", NEW, epic.getId());
+        taskManager.addSubTask(subTask);
 
-        assertNotNull(taskManager.getTask(1), "Задача не добавлена");
-        assertNotNull(taskManager.getEpic(2), "Эпик не добавлен");
-        assertNotNull(taskManager.getSubTask(3), "Подзадача не добавлена");
+        assertNotNull(taskManager.getTask(task.getId()), "Задача не добавлена");
+        assertNotNull(taskManager.getEpic(epic.getId()), "Эпик не добавлен");
+        assertNotNull(taskManager.getSubTask(subTask.getId()), "Подзадача не добавлена");
     }
 
     // проверяем, что задачи с заданным и сгенерированным id не конфликтуют внутри менеджера
@@ -104,8 +107,12 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task1);
         Epic epic1 = new Epic("Эпик 1", "Тестовый эпик 1", NEW);
         taskManager.addEpic(epic1);
-        SubTask subTask1 = new SubTask(epic1.getId(), "Подзадача 2", "Тестовая подзадача 1", NEW);
+        SubTask subTask1 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epic1.getId());
         taskManager.addSubTask(subTask1);
+        SubTask subTask2 = new SubTask("Подзадача 2", "Тестовая подзадача 2", NEW, epic1.getId());
+        taskManager.addSubTask(subTask2);
+        SubTask subTask3 = new SubTask("Подзадача 3", "Тестовая подзадача 3", NEW, epic1.getId());
+        taskManager.addSubTask(subTask3);
 
         taskManager.deleteTask(task1.getId());
         taskManager.deleteSubTask(subTask1.getId());
@@ -123,8 +130,10 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task1);
         Epic epic1 = new Epic("Эпик 1", "Тестовый эпик 1", NEW);
         taskManager.addEpic(epic1);
-        SubTask subTask1 = new SubTask(epic1.getId(), "Подзадача 1", "Тестовая подзадача 1", NEW);
+        SubTask subTask1 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epic1.getId());
         taskManager.addSubTask(subTask1);
+        SubTask subTask2 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epic1.getId());
+        taskManager.addSubTask(subTask2);
 
         taskManager.deleteAllTask();
         taskManager.deleteAllEpic();
@@ -147,16 +156,16 @@ class InMemoryTaskManagerTest {
         taskManager.updateEpic(epic2);
         Epic deletedEpic = taskManager.getEpic(id);
         taskManager.deleteEpic(id);
-        SubTask subTask1 = new SubTask(epic1.getId(), "Подзадача 1", "Тестовая подзадача 1", NEW);
+        SubTask subTask1 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epic1.getId());
         taskManager.addSubTask(subTask1);
-        Epic updateEpic = new Epic(epic1.getId(), epic1.getSubTaskId(),
-                "Эпик 1", "Тестовый эпик 1", DONE);
+        Epic updateEpic = new Epic(epic1.getId(),
+                "Эпик 1", "Тестовый эпик 1", DONE, epic1.getSubTaskIds());
         taskManager.updateEpic(updateEpic);
 
         Status status = taskManager.getEpic(epic1.getId()).getStatus();
         assertEquals(NEW, status, "Статус эпика нельзя менять вручную.");
-        SubTask updateSubTask1 = new SubTask(subTask1.getId(), subTask1.getEpicId(), "Подзадача 1",
-                "Тестовая подзадача 1", IN_PROGRESS);
+        SubTask updateSubTask1 = new SubTask(subTask1.getId(), "Подзадача 1",
+                "Тестовая подзадача 1", IN_PROGRESS, subTask1.getEpicId());
         taskManager.updateSubTask(updateSubTask1);
 
         Epic statusEpic = taskManager.getEpic(updateEpic.getId());
@@ -170,15 +179,18 @@ class InMemoryTaskManagerTest {
     // добавление задач в историю просмотров
     @Test
     void addHistory() {
-        taskManager.addTask(new Task("Задача 1", "Задача 1", NEW));
-        taskManager.addTask(new Task("Задача 2", "Задача 2", NEW));
-        taskManager.addTask(new Task("Задача 3", "Задача 3", NEW));
-        taskManager.getTask(1);
-        taskManager.getTask(2);
-        final Task savedTask = taskManager.getTask(3);
+        Task task = new Task("Задача 1", "Задача 1", NEW);
+        Task task1 = new Task("Задача 2", "Задача 2", NEW);
+        Task task2 = new Task("Задача 3", "Задача 3", NEW);
+        taskManager.addTask(task);
+        taskManager.addTask(task1);
+        taskManager.addTask(task2);
+        taskManager.getTask(task.getId());
+        taskManager.getTask(task1.getId());
+        final Task savedTask = taskManager.getTask(task2.getId());
         taskManager.getTask(4);
         List<Task> history = taskManager.getHistory();
-        final Task historyTask = history.get(2);
+        final Task historyTask = history.get(1);
         assertNotNull(historyTask, "Задача не найдена.");
         assertEquals(savedTask, historyTask, "Задачи не совпадают.");
     }
@@ -190,15 +202,15 @@ class InMemoryTaskManagerTest {
         Task lastHistory = taskManager.addTask(new Task("Задача 2", "Задача 2", NEW));
         taskManager.addTask(new Task("Задача 3", "Задача 3", NEW));
         taskManager.addEpic(new Epic("Задача 4", "Задача 4", NEW));
-        taskManager.addSubTask(new SubTask(4, "Задача 5", "Задача 5", NEW));
-        taskManager.getTask(1);
-        taskManager.getTask(2);
-        taskManager.getTask(3);
-        taskManager.getEpic(4);
-        taskManager.getSubTask(5);
-        taskManager.deleteTask(1);
-        taskManager.getTask(2);
-        taskManager.deleteTask(2);
+        taskManager.addSubTask(new SubTask("Задача 5", "Задача 5", NEW, 4));
+        taskManager.getTask(11);
+        taskManager.getTask(13);
+        taskManager.getTask(12);
+        taskManager.getEpic(14);
+        taskManager.getSubTask(15);
+        taskManager.deleteTask(11);
+        taskManager.getTask(12);
+        taskManager.deleteTask(12);
         List<Task> history = taskManager.getHistory();
         Task deleteFirstHistory = history.getFirst();
         Task deleteLastHistory = history.getLast();
@@ -208,7 +220,7 @@ class InMemoryTaskManagerTest {
 
     // проверка обновления задачи
     @Test
-    void checkingUpdateTask () {
+    void checkingUpdateTask() {
         Task task = new Task("Задача 1", "Задача 1", NEW);
         Task task2 = new Task("Задача 2", "Задача 2", NEW);
         taskManager.addTask(task);
@@ -220,6 +232,19 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(task2);
         Task updateTask = taskManager.getTask(task2.getId());
         assertEquals(task.getDescription(), "Обновленная задача 1", "Задачи не изменилась.");
-        assertNull(updateTask,"Задача не удалена и обновлена.");
+        assertNull(updateTask, "Задача не удалена и обновлена.");
+    }
+
+    @Test
+    void testDeleteSubTasks() { // тест удаления всех подзадач
+        Epic epic = new Epic("Эпик", "Удаление подзадач эпика", NEW);
+        taskManager.addEpic(epic);
+        SubTask subTask1 = new SubTask("Подзадача 1", "Тест удаления подзадач", NEW, epic.getId());
+        SubTask subTask2 = new SubTask("Подзадача 2", "Тест удаления подзадач", NEW, epic.getId());
+        taskManager.addSubTask(subTask1);
+        taskManager.addSubTask(subTask2);
+        taskManager.deleteSubtasks(); // удаляем все подзадачи
+        List<Integer> subTasks = new ArrayList<>(epic.getSubTaskIds());
+        assertNotEquals(subTasks, "[]", "Подзадачи не удалены!");
     }
 }

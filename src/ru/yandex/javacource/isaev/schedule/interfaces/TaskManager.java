@@ -1,8 +1,8 @@
 package ru.yandex.javacource.isaev.schedule.interfaces;
 
-import ru.yandex.javacource.isaev.schedule.task.Epic;
-import ru.yandex.javacource.isaev.schedule.task.SubTask;
-import ru.yandex.javacource.isaev.schedule.task.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.Epic;
+import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
+import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public interface TaskManager {
 
     List<SubTask> getSubTaskList();
 
-    void addSubTask(SubTask subTask);
+    SubTask addSubTask(SubTask subTask);
 
     void updateSubTask(SubTask subTask);
 
