@@ -85,6 +85,7 @@ class InMemoryTaskManagerTest {
     // проверяем, что задачи с заданным и сгенерированным id не конфликтуют внутри менеджера
     @Test
     void weCheckThatTasksWithSpecifiedAndGeneratedIdNotConflict() {
+        FileBackedTaskManager.setGeneratorId(0);
         Task task1 = new Task("Задача 1", "Тестовая задача с генерацией id", NEW);
         Task task2 = new Task(2, "Задача 2", "Тестовая задача с заданной id", NEW);
 
@@ -198,19 +199,20 @@ class InMemoryTaskManagerTest {
     // удаление задачи из истории
     @Test
     void removeTaskOfHistory() {
+        FileBackedTaskManager.setGeneratorId(0);
         Task firstHistory = taskManager.addTask(new Task("Задача 1", "Задача 1", NEW));
         Task lastHistory = taskManager.addTask(new Task("Задача 2", "Задача 2", NEW));
         taskManager.addTask(new Task("Задача 3", "Задача 3", NEW));
         taskManager.addEpic(new Epic("Задача 4", "Задача 4", NEW));
         taskManager.addSubTask(new SubTask("Задача 5", "Задача 5", NEW, 4));
-        taskManager.getTask(11);
-        taskManager.getTask(13);
-        taskManager.getTask(12);
-        taskManager.getEpic(14);
-        taskManager.getSubTask(15);
-        taskManager.deleteTask(11);
-        taskManager.getTask(12);
-        taskManager.deleteTask(12);
+        taskManager.getTask(1);
+        taskManager.getTask(3);
+        taskManager.getTask(2);
+        taskManager.getEpic(4);
+        taskManager.getSubTask(5);
+        taskManager.deleteTask(1);
+        taskManager.getTask(3);
+        taskManager.deleteTask(3);
         List<Task> history = taskManager.getHistory();
         Task deleteFirstHistory = history.getFirst();
         Task deleteLastHistory = history.getLast();
