@@ -1,11 +1,11 @@
-package ru.yandex.javacource.isaev.schedule.manager;
+package ru.yandex.javacource.isaev.schedule.managers;
 
+import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
-import ru.yandex.javacource.isaev.schedule.task.Epic;
-import ru.yandex.javacource.isaev.schedule.task.Status;
-import ru.yandex.javacource.isaev.schedule.task.SubTask;
-import ru.yandex.javacource.isaev.schedule.task.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.Epic;
+import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
+import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +13,15 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int generatorId = 0; // идентификатор
+    private static int generatorId = 0; // идентификатор
     private final Map<Integer, Task> tasks = new HashMap<>(); // карта с задачами
     private final Map<Integer, Epic> epics = new HashMap<>(); // карта с эпиками
     private final Map<Integer, SubTask> subTasks = new HashMap<>(); // карта с подзадачами
     private final HistoryManager historyManager = Managers.getDefaultHistory(); // менеджер истории просмотра задач
+
+    protected static void setGeneratorId(int currentId) {
+        generatorId = currentId;
+    }
 
     // методы для задач
 
@@ -86,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (savedEpic == null) {
             return;
         }
-        epic.setSubTaskId(savedEpic.getSubTaskId());
+        epic.setSubTaskId(savedEpic.getSubTaskIds());
         epic.setStatus(savedEpic.getStatus());
         epics.put(epic.getId(), epic);
     }
@@ -98,10 +102,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
-        if (epic.getSubTaskId() == null) {
+        if (epic.getSubTaskIds() == null) {
             return;
         }
-        for (Integer subTaskId : epic.getSubTaskId()) {
+        for (Integer subTaskId : epic.getSubTaskIds()) {
             historyManager.remove(subTaskId);
             subTasks.remove(subTaskId);
         }
@@ -134,17 +138,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubTask(SubTask subTask) { //добавление подзадачи
+    public SubTask addSubTask(SubTask subTask) { //добавление подзадачи
         int epicId = subTask.getEpicId();
         Epic epic = epics.get(epicId);
         if (epic == null) {
-            return;
+            return subTask;
         }
         int id = generatorId();
         subTask.setId(id);
         subTasks.put(id, subTask);
         epic.addSubTaskId(subTask.getId());
         updateEpicStatus(epicId);
+        return subTask;
     }
 
     @Override
@@ -207,7 +212,8 @@ public class InMemoryTaskManager implements TaskManager {
     private void updateEpicStatus(int epicId) {  // проверка статуса эпика
         Epic updateEpic = epics.get(epicId);
         ArrayList<Status> status = new ArrayList<>();
-        for (int subTaskId : updateEpic.getSubTaskId()) {
+
+        for (int subTaskId : updateEpic.getSubTaskIds()) {
             status.add(subTasks.get(subTaskId).getStatus());
         }
         if (status.contains(Status.NEW) && status.contains(Status.DONE) || status.contains(Status.IN_PROGRESS)) {

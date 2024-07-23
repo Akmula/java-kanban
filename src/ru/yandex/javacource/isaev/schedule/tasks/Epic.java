@@ -1,23 +1,22 @@
-package ru.yandex.javacource.isaev.schedule.task;
+package ru.yandex.javacource.isaev.schedule.tasks;
 
-import java.util.ArrayList;
+import ru.yandex.javacource.isaev.schedule.enums.Status;
+
 import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
-    private List<Integer> subTaskIds = new ArrayList<>();
+    public Epic(int id, String title, String description, Status status) {
+        super(id, title, description, status);
+    }
 
     public Epic(String title, String description, Status status) {
         super(title, description, status);
     }
 
-    public Epic(int id, List<Integer> subTaskIds, String title, String description, Status status) {
+    public Epic(int id, String title, String description, Status status, List<Integer> subTaskIds) {
         super(id, title, description, status);
         this.subTaskIds = subTaskIds;
-    }
-
-    public List<Integer> getSubTaskId() {
-        return subTaskIds;
     }
 
     public void setSubTaskId(List<Integer> subTaskIds) {
@@ -45,9 +44,8 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subTaskIds=" + subTaskIds +
-                "} " + super.toString();
+        return "Epic - subTaskIds="
+                + subTaskIds + "," + super.toString();
     }
 
     @Override

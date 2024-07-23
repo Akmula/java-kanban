@@ -1,7 +1,7 @@
-package ru.yandex.javacource.isaev.schedule.manager;
+package ru.yandex.javacource.isaev.schedule.managers;
 
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
-import ru.yandex.javacource.isaev.schedule.task.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;

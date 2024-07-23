@@ -1,4 +1,4 @@
-package ru.yandex.javacource.isaev.schedule.task;
+package ru.yandex.javacource.isaev.schedule.enums;
 
 public enum Status {
     NEW,

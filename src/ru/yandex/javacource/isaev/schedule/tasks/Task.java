@@ -1,5 +1,9 @@
-package ru.yandex.javacource.isaev.schedule.task;
+package ru.yandex.javacource.isaev.schedule.tasks;
 
+import ru.yandex.javacource.isaev.schedule.enums.Status;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Task {
@@ -7,6 +11,9 @@ public class Task {
     private String title;
     private String description;
     private Status status;
+    private int epicId;
+    private int subTaskId;
+    List<Integer> subTaskIds = new ArrayList<>();
 
     public Task(int id, String title, String description, Status status) {
         this.id = id;
@@ -23,6 +30,14 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public int getEpicId() {
+        return epicId;
+    }
+
+    public int getSubTaskId() {
+        return subTaskId;
     }
 
     public void setId(int id) {
@@ -56,12 +71,11 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}' + "\n";
+        return "Task - id=" + id
+                + ", title=" + title
+                + ", description=" + description
+                + ", status=" + status
+                + "\n";
     }
 
     @Override
@@ -75,5 +89,9 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, description, status);
+    }
+
+    public List<Integer> getSubTaskIds() {
+        return subTaskIds;
     }
 }
