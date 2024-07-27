@@ -65,7 +65,7 @@ public class Main {
         System.out.println("Изменение статусов!");
         Task task1Update = new Task(task1.getId(), task1.getTitle(), task1.getDescription(), Status.DONE);
         Epic epic1Update = new Epic(epic1.getId(),
-                epic1.getTitle(), epic1.getDescription(), Status.DONE, epic1.getSubTaskIds());
+                epic1.getTitle(), epic1.getDescription(), Status.DONE, epic1.getSubTaskIdList());
         SubTask subTask2Update = new SubTask(subTask2.getId(),
                 subTask2.getTitle(), subTask2.getDescription(), Status.DONE, subTask2.getEpicId());
         taskManager.updateTask(task1Update);

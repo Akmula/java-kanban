@@ -1,7 +1,9 @@
 package ru.yandex.javacource.isaev.schedule.managers;
 
 import ru.yandex.javacource.isaev.schedule.enums.Status;
-import ru.yandex.javacource.isaev.schedule.exceptions.ManagerFileException;
+import ru.yandex.javacource.isaev.schedule.enums.TaskType;
+import ru.yandex.javacource.isaev.schedule.exceptions.ManagerLoadException;
+import ru.yandex.javacource.isaev.schedule.exceptions.ManagerSaveException;
 import ru.yandex.javacource.isaev.schedule.formatters.CSVFormatter;
 import ru.yandex.javacource.isaev.schedule.tasks.Epic;
 import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
@@ -13,47 +15,37 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static File file;
-    private static Path path;
+    static File file;
 
-    public FileBackedTaskManager(File file) {
+   FileBackedTaskManager(File file) {
         FileBackedTaskManager.file = file;
-        path = Paths.get(String.valueOf(file));
-        if (!Files.exists(path)) {
-            try {
-                Files.createFile(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
-    public FileBackedTaskManager loadFromFile() {
+    public static FileBackedTaskManager loadFromFile() {
         int maxId = 0;
+        setGeneratorId(0);
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             for (int i = 1; i < lines.size(); i++) {
                 Task task = CSVFormatter.fromString(lines.get(i));
                 if (maxId < task.getId()) {
                     maxId = task.getId();
                 }
-                if (task instanceof Epic) {
+                if (task.getTaskType().equals(TaskType.EPIC)) {
                     fileBackedTaskManager.addEpic((Epic) task);
-                } else if (task instanceof SubTask) {
+                } else if (task.getTaskType().equals(TaskType.SUBTASK)) {
                     fileBackedTaskManager.addSubTask((SubTask) task);
                 } else {
                     fileBackedTaskManager.addTask(task);
                 }
             }
         } catch (IOException e) {
-            throw ManagerFileException.loadExceptions(e);
+            throw new ManagerLoadException("Ошибка чтения файла!", e);
         }
         InMemoryTaskManager.setGeneratorId(maxId);
         return fileBackedTaskManager;
@@ -63,17 +55,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<Task> tasks = getTaskList();
         tasks.addAll(getEpicList());
         tasks.addAll(getSubTaskList());
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.valueOf(path), StandardCharsets.UTF_8))) {
-
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             bw.write(CSVFormatter.getHeader());
             bw.newLine();
-
             for (Task task : tasks) {
                 bw.write(CSVFormatter.toString(task));
                 bw.newLine();
             }
         } catch (IOException e) {
-            throw ManagerFileException.saveExceptions(e);
+            throw new ManagerSaveException("Ошибка сохранения файла", e);
         }
     }
 
@@ -161,7 +151,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         fileBackedTaskManager.addSubTask(new SubTask("Подзадача 2", "Тестовая подзадача 2", Status.NEW, 3));
 
         setGeneratorId(0);
-        FileBackedTaskManager fileBackedTaskManager1 = fileBackedTaskManager.loadFromFile();
+        FileBackedTaskManager fileBackedTaskManager1 = loadFromFile();
 
         System.out.println("Задача из менеджера - " + fileBackedTaskManager.getTaskList());
         System.out.println("Задача из файла - " + fileBackedTaskManager1.getTaskList());

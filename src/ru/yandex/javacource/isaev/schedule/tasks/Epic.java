@@ -1,13 +1,17 @@
 package ru.yandex.javacource.isaev.schedule.tasks;
 
 import ru.yandex.javacource.isaev.schedule.enums.Status;
+import ru.yandex.javacource.isaev.schedule.enums.TaskType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
-    public Epic(int id, String title, String description, Status status) {
-        super(id, title, description, status);
+    private List<Integer> subTaskIdList = new ArrayList<>();
+
+    public Epic(int id, TaskType taskType, String title, String description, Status status) {
+        super(id, taskType, title, description, status);
     }
 
     public Epic(String title, String description, Status status) {
@@ -16,36 +20,40 @@ public class Epic extends Task {
 
     public Epic(int id, String title, String description, Status status, List<Integer> subTaskIds) {
         super(id, title, description, status);
-        this.subTaskIds = subTaskIds;
+        this.subTaskIdList = subTaskIds;
+    }
+
+    public List<Integer> getSubTaskIdList() {
+        return subTaskIdList;
     }
 
     public void setSubTaskId(List<Integer> subTaskIds) {
-        this.subTaskIds = subTaskIds;
+        this.subTaskIdList = subTaskIds;
     }
 
     public void addSubTaskId(int id) {
-        subTaskIds.add(id);
+        subTaskIdList.add(id);
     }
 
     public void removeSubtask(int id) {
-        if (subTaskIds == null) {
+        if (subTaskIdList == null) {
             return;
         }
-        for (int i = 0; i < subTaskIds.size(); i++) {
-            if (subTaskIds.get(i) == id) {
-                subTaskIds.remove(i);
+        for (int i = 0; i < subTaskIdList.size(); i++) {
+            if (subTaskIdList.get(i) == id) {
+                subTaskIdList.remove(i);
             }
         }
     }
 
     public void cleanSubTaskIds() {
-        this.subTaskIds.clear();
+        this.subTaskIdList.clear();
     }
 
     @Override
     public String toString() {
-        return "Epic - subTaskIds="
-                + subTaskIds + "," + super.toString();
+        return super.toString()
+                + ", subTaskIds=" + subTaskIdList;
     }
 
     @Override
@@ -54,11 +62,11 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(subTaskIds, epic.subTaskIds);
+        return Objects.equals(subTaskIdList, epic.subTaskIdList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subTaskIds);
+        return Objects.hash(super.hashCode(), subTaskIdList);
     }
 }

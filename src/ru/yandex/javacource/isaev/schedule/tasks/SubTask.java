@@ -1,11 +1,17 @@
 package ru.yandex.javacource.isaev.schedule.tasks;
 
 import ru.yandex.javacource.isaev.schedule.enums.Status;
+import ru.yandex.javacource.isaev.schedule.enums.TaskType;
 
 import java.util.Objects;
 
 public class SubTask extends Task {
-    private int epicId;
+    private Integer epicId;
+
+    public SubTask(int id, TaskType taskType, String title, String description, Status status, int epicId) {
+        super(id, taskType, title, description, status);
+        this.epicId = epicId;
+    }
 
     public SubTask(int id, String title, String description, Status status, int epicId) {
         super(id, title, description, status);
@@ -27,17 +33,15 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask - epicId=" + epicId
-                + "," + super.toString();
+        return super.toString()
+                + ", epicId=" + epicId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        SubTask subTask = (SubTask) o;
-        return epicId == subTask.epicId;
+        return super.equals(o);
     }
 
     @Override

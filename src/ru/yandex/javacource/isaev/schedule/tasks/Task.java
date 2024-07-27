@@ -1,19 +1,24 @@
 package ru.yandex.javacource.isaev.schedule.tasks;
 
 import ru.yandex.javacource.isaev.schedule.enums.Status;
+import ru.yandex.javacource.isaev.schedule.enums.TaskType;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Task {
-    private int id;
+    private Integer id;
+    private TaskType taskType;
     private String title;
     private String description;
     private Status status;
-    private int epicId;
-    private int subTaskId;
-    List<Integer> subTaskIds = new ArrayList<>();
+
+    public Task(int id, TaskType taskType, String title, String description, Status status) {
+        this.id = id;
+        this.taskType = taskType;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
 
     public Task(int id, String title, String description, Status status) {
         this.id = id;
@@ -32,16 +37,16 @@ public class Task {
         return id;
     }
 
-    public int getEpicId() {
-        return epicId;
-    }
-
-    public int getSubTaskId() {
-        return subTaskId;
-    }
-
     public void setId(int id) {
         this.id = id;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     public String getTitle() {
@@ -71,11 +76,11 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task - id=" + id
+        return "\n id=" + id
+                + ", Type=" + taskType
                 + ", title=" + title
                 + ", description=" + description
-                + ", status=" + status
-                + "\n";
+                + ", status=" + status;
     }
 
     @Override
@@ -89,9 +94,5 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, description, status);
-    }
-
-    public List<Integer> getSubTaskIds() {
-        return subTaskIds;
     }
 }

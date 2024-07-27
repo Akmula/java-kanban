@@ -160,7 +160,7 @@ class InMemoryTaskManagerTest {
         SubTask subTask1 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epic1.getId());
         taskManager.addSubTask(subTask1);
         Epic updateEpic = new Epic(epic1.getId(),
-                "Эпик 1", "Тестовый эпик 1", DONE, epic1.getSubTaskIds());
+                "Эпик 1", "Тестовый эпик 1", DONE, epic1.getSubTaskIdList());
         taskManager.updateEpic(updateEpic);
 
         Status status = taskManager.getEpic(epic1.getId()).getStatus();
@@ -179,7 +179,7 @@ class InMemoryTaskManagerTest {
 
     // добавление задач в историю просмотров
     @Test
-    void addHistory() {
+    void checkingTheAdditionOfTasksToTheBrowsingHistory() {
         Task task = new Task("Задача 1", "Задача 1", NEW);
         Task task1 = new Task("Задача 2", "Задача 2", NEW);
         Task task2 = new Task("Задача 3", "Задача 3", NEW);
@@ -189,7 +189,7 @@ class InMemoryTaskManagerTest {
         taskManager.getTask(task.getId());
         taskManager.getTask(task1.getId());
         final Task savedTask = taskManager.getTask(task2.getId());
-        taskManager.getTask(4);
+        taskManager.getTask(task1.getId());
         List<Task> history = taskManager.getHistory();
         final Task historyTask = history.get(1);
         assertNotNull(historyTask, "Задача не найдена.");
@@ -198,7 +198,7 @@ class InMemoryTaskManagerTest {
 
     // удаление задачи из истории
     @Test
-    void removeTaskOfHistory() {
+    void checkingRemoveTaskOfHistory() {
         FileBackedTaskManager.setGeneratorId(0);
         Task firstHistory = taskManager.addTask(new Task("Задача 1", "Задача 1", NEW));
         Task lastHistory = taskManager.addTask(new Task("Задача 2", "Задача 2", NEW));
@@ -238,7 +238,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void testDeleteSubTasks() { // тест удаления всех подзадач
+    void checkingDeleteAllSubTasks() { // тест удаления всех подзадач
         Epic epic = new Epic("Эпик", "Удаление подзадач эпика", NEW);
         taskManager.addEpic(epic);
         SubTask subTask1 = new SubTask("Подзадача 1", "Тест удаления подзадач", NEW, epic.getId());
@@ -246,7 +246,7 @@ class InMemoryTaskManagerTest {
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
         taskManager.deleteSubtasks(); // удаляем все подзадачи
-        List<Integer> subTasks = new ArrayList<>(epic.getSubTaskIds());
+        List<Integer> subTasks = new ArrayList<>(epic.getSubTaskIdList());
         assertNotEquals(subTasks, "[]", "Подзадачи не удалены!");
     }
 }
