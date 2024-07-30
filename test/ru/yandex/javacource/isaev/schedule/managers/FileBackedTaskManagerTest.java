@@ -1,5 +1,6 @@
 package ru.yandex.javacource.isaev.schedule.managers;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacource.isaev.schedule.enums.Status;
@@ -14,9 +15,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest {
 
-    private static File tempFile;
+    File tempFile;
+    static File tempEmptyFile;
     FileBackedTaskManager fileBackedTaskManager;
-    FileBackedTaskManager fileBackedTaskManagerForEmptyFile;
+    static FileBackedTaskManager fileBackedTaskManagerForEmptyFile;
+
+    @BeforeAll
+    static void checkingSavingAndLoadingEmptyFile() {
+        try {
+            tempEmptyFile = File.createTempFile("tempEmptyData", ".csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileBackedTaskManagerForEmptyFile = new FileBackedTaskManager(tempEmptyFile);
+
+        Task task = fileBackedTaskManagerForEmptyFile.getTask(1);
+        assertTrue(tempEmptyFile.isAbsolute(), "Файл не создан!");
+        assertNull(task, "Задача существует! Файл не пустой");
+    }
 
     @BeforeEach
     public void beforeEach() {
@@ -25,9 +41,7 @@ class FileBackedTaskManagerTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        FileBackedTaskManager.setGeneratorId(0);
         fileBackedTaskManager = new FileBackedTaskManager(tempFile);
-        fileBackedTaskManagerForEmptyFile = new FileBackedTaskManager(tempFile);
 
         Task task1 = new Task("Задача 1", "Тестовая задача 1", Status.NEW);
         Task task2 = new Task("Задача 2", "Тестовая задача 2", Status.NEW);
@@ -41,13 +55,6 @@ class FileBackedTaskManagerTest {
         SubTask subTask2 = new SubTask("Подзадача 6", "Тестовая подзадача 2", Status.NEW, epic1.getId());
         fileBackedTaskManager.addSubTask(subTask1);
         fileBackedTaskManager.addSubTask(subTask2);
-    }
-
-    @Test
-    void checkingSavingAndLoadingEmptyFile() {
-        Task task = fileBackedTaskManagerForEmptyFile.getTask(1);
-        assertTrue(tempFile.isAbsolute(), "Файл не создан!");
-        assertNull(task, "Задача существует! Файл не пустой");
     }
 
     @Test

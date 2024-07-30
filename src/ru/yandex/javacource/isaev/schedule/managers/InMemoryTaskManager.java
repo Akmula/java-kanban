@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static Integer generatorId = 0; // идентификатор
-    private final Map<Integer, Task> tasks = new HashMap<>(); // карта с задачами
-    private final Map<Integer, Epic> epics = new HashMap<>(); // карта с эпиками
-    private final Map<Integer, SubTask> subTasks = new HashMap<>(); // карта с подзадачами
-    private final HistoryManager historyManager = Managers.getDefaultHistory(); // менеджер истории просмотра задач
+    protected Integer generatorId = 0; // идентификатор
+    final HistoryManager historyManager = Managers.getDefaultHistory(); // менеджер истории просмотра задач
+    protected static final Map<Integer, Task> tasks = new HashMap<>(); // карта с задачами
+    protected static final Map<Integer, Epic> epics = new HashMap<>(); // карта с эпиками
+    protected static final Map<Integer, SubTask> subTasks = new HashMap<>(); // карта с подзадачами
 
-    protected static void setGeneratorId(int currentId) {
-        generatorId = currentId;
+    protected void setGeneratorId(int id) {
+        this.generatorId = id;
     }
 
     // методы для задач

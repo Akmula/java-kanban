@@ -14,7 +14,7 @@ public class CSVFormatter {
     }
 
     public static String getHeader() {
-        return "id;type;title;description;status;epicId";
+        return "id,type,title,description,status,epicId";
     }
 
     public static String toString(Task task) {
@@ -32,7 +32,7 @@ public class CSVFormatter {
     }
 
     public static Task fromString(String string) {
-        Task task = null;
+        Task task;
         String[] split = string.split(",");
         int id = Integer.parseInt(split[0]);
         TaskType taskType = valueOf(split[1]);

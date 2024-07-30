@@ -1,7 +1,6 @@
 package ru.yandex.javacource.isaev.schedule.managers;
 
 import ru.yandex.javacource.isaev.schedule.enums.Status;
-import ru.yandex.javacource.isaev.schedule.enums.TaskType;
 import ru.yandex.javacource.isaev.schedule.exceptions.ManagerLoadException;
 import ru.yandex.javacource.isaev.schedule.exceptions.ManagerSaveException;
 import ru.yandex.javacource.isaev.schedule.formatters.CSVFormatter;
@@ -19,15 +18,14 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    static File file;
+    private static File file;
 
-   FileBackedTaskManager(File file) {
+    FileBackedTaskManager(File file) {
         FileBackedTaskManager.file = file;
     }
 
     public static FileBackedTaskManager loadFromFile() {
         int maxId = 0;
-        setGeneratorId(0);
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         try {
             List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
@@ -36,18 +34,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (maxId < task.getId()) {
                     maxId = task.getId();
                 }
-                if (task.getTaskType().equals(TaskType.EPIC)) {
-                    fileBackedTaskManager.addEpic((Epic) task);
-                } else if (task.getTaskType().equals(TaskType.SUBTASK)) {
-                    fileBackedTaskManager.addSubTask((SubTask) task);
-                } else {
-                    fileBackedTaskManager.addTask(task);
-                }
+                addAnyTask(task);
             }
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка чтения файла!", e);
         }
-        InMemoryTaskManager.setGeneratorId(maxId);
+        fileBackedTaskManager.setGeneratorId(maxId);
         return fileBackedTaskManager;
     }
 
@@ -64,6 +56,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения файла", e);
+        }
+    }
+
+    protected static void addAnyTask(Task task) {
+        final int id = task.getId();
+        switch (task.getTaskType()) {
+            case TASK:
+                tasks.put(id, task);
+                break;
+            case SUBTASK:
+                subTasks.put(id, (SubTask) task);
+                break;
+            case EPIC:
+                epics.put(id, (Epic) task);
+                break;
         }
     }
 
@@ -150,7 +157,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         fileBackedTaskManager.addSubTask(new SubTask("Подзадача 1", "Тестовая подзадача 1", Status.NEW, 2));
         fileBackedTaskManager.addSubTask(new SubTask("Подзадача 2", "Тестовая подзадача 2", Status.NEW, 3));
 
-        setGeneratorId(0);
         FileBackedTaskManager fileBackedTaskManager1 = loadFromFile();
 
         System.out.println("Задача из менеджера - " + fileBackedTaskManager.getTaskList());
