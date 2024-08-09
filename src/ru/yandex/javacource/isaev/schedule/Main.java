@@ -1,11 +1,11 @@
 package ru.yandex.javacource.isaev.schedule;
 
+import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
-import ru.yandex.javacource.isaev.schedule.manager.Managers;
-import ru.yandex.javacource.isaev.schedule.task.Epic;
-import ru.yandex.javacource.isaev.schedule.task.Status;
-import ru.yandex.javacource.isaev.schedule.task.SubTask;
-import ru.yandex.javacource.isaev.schedule.task.Task;
+import ru.yandex.javacource.isaev.schedule.managers.Managers;
+import ru.yandex.javacource.isaev.schedule.tasks.Epic;
+import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
+import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 public class Main {
 
@@ -29,13 +29,13 @@ public class Main {
 
         // добавление подзадач
         System.out.println("Добавление подзадач!");
-        SubTask subTask1 = new SubTask(epic1.getId(), "Подзадача 1", "Создать подзадачу 1", Status.NEW);
+        SubTask subTask1 = new SubTask("Подзадача 1", "Создать подзадачу 1", Status.NEW, epic1.getId());
         taskManager.addSubTask(subTask1);
         System.out.print("Добавлена подзадача = " + subTask1);
-        SubTask subTask2 = new SubTask(epic2.getId(), "Подзадача 2", "Создать подзадачу 2", Status.NEW);
+        SubTask subTask2 = new SubTask("Подзадача 2", "Создать подзадачу 2", Status.NEW, epic2.getId());
         taskManager.addSubTask(subTask2);
         System.out.print("Добавлена подзадача = " + subTask2);
-        SubTask subTask3 = new SubTask(epic2.getId(), "Подзадача 3", "Создать подзадачу 3", Status.NEW);
+        SubTask subTask3 = new SubTask("Подзадача 3", "Создать подзадачу 3", Status.NEW, epic2.getId());
         taskManager.addSubTask(subTask3);
         System.out.println("Добавлена подзадача = " + subTask3);
 
@@ -64,10 +64,10 @@ public class Main {
         // изменение статусов
         System.out.println("Изменение статусов!");
         Task task1Update = new Task(task1.getId(), task1.getTitle(), task1.getDescription(), Status.DONE);
-        Epic epic1Update = new Epic(epic1.getId(), epic1.getSubTaskId(),
-                epic1.getTitle(), epic1.getDescription(), Status.DONE);
-        SubTask subTask2Update = new SubTask(subTask2.getId(), subTask2.getEpicId(),
-                subTask2.getTitle(), subTask2.getDescription(), Status.DONE);
+        Epic epic1Update = new Epic(epic1.getId(),
+                epic1.getTitle(), epic1.getDescription(), Status.DONE, epic1.getSubTaskIdList());
+        SubTask subTask2Update = new SubTask(subTask2.getId(),
+                subTask2.getTitle(), subTask2.getDescription(), Status.DONE, subTask2.getEpicId());
         taskManager.updateTask(task1Update);
         System.out.println("Статус задачи изменен на DONE: " + task1Update);
         taskManager.updateEpic(epic1Update);
@@ -116,9 +116,9 @@ public class Main {
         Task id9 = new Task("Задача номер 2", "дополнительное задание", Status.NEW);
         Epic id10 = new Epic("Эпик 1", "дополнительное задание", Status.NEW);
         Epic id11 = new Epic("Эпик 2", "дополнительное задание", Status.NEW);
-        SubTask id12 = new SubTask(10, "Подзадача 1", "дополнительное задание", Status.NEW);
-        SubTask id13 = new SubTask(10, "Подзадача 2", "дополнительное задание", Status.NEW);
-        SubTask id14 = new SubTask(10, "Подзадача 3", "дополнительное задание", Status.NEW);
+        SubTask id12 = new SubTask("Подзадача 1", "дополнительное задание", Status.NEW, 10);
+        SubTask id13 = new SubTask("Подзадача 2", "дополнительное задание", Status.NEW, 10);
+        SubTask id14 = new SubTask("Подзадача 3", "дополнительное задание", Status.NEW, 10);
         taskManager.addTask(id8);
         taskManager.addTask(id9);
         taskManager.addEpic(id10);
