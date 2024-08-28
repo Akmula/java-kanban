@@ -14,19 +14,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-
-    private static File file;
+    private final static String PATH_TO_FILE = "src/ru/yandex/javacource/isaev/schedule/resources/data.csv";
+    private final File file;
 
     FileBackedTaskManager(File file) {
-        FileBackedTaskManager.file = file;
+        this.file = file;
     }
 
-    public static FileBackedTaskManager loadFromFile() {
+    public static FileBackedTaskManager loadFromFile(File file) {
         int maxId = 0;
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+
         try {
             List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             for (int i = 1; i < lines.size(); i++) {
@@ -34,7 +37,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (maxId < task.getId()) {
                     maxId = task.getId();
                 }
-                addAnyTask(task);
+                fileBackedTaskManager.addAnyTask(task);
             }
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка чтения файла!", e);
@@ -45,9 +48,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() { // сохранение задачи
         List<Task> tasks = getTaskList();
-        tasks.addAll(getEpicList());
-        tasks.addAll(getSubTaskList());
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
+        if (getEpicList() != null) tasks.addAll(getEpicList());
+        if (getSubTaskList() != null) tasks.addAll(getSubTaskList());
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.valueOf(file), StandardCharsets.UTF_8))) {
             bw.write(CSVFormatter.getHeader());
             bw.newLine();
             for (Task task : tasks) {
@@ -59,7 +62,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    protected static void addAnyTask(Task task) {
+    protected void addAnyTask(Task task) {
         final int id = task.getId();
         switch (task.getTaskType()) {
             case TASK:
@@ -144,26 +147,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteSubtasks() { // удаление всех подзадач
-        super.deleteSubtasks();
+    public void deleteAllSubtask() { // удаление всех подзадач
+        super.deleteAllSubtask();
         save();
     }
 
     public static void main(String[] args) {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new File("data.csv"));
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new File(PATH_TO_FILE));
 
-        fileBackedTaskManager.addTask(new Task("Задача 1", "Тестовая задача 1", Status.NEW));
-        fileBackedTaskManager.addEpic(new Epic("Эпик 1", "Тестовый эпик 1", Status.NEW));
-        fileBackedTaskManager.addSubTask(new SubTask("Подзадача 1", "Тестовая подзадача 1", Status.NEW, 2));
-        fileBackedTaskManager.addSubTask(new SubTask("Подзадача 2", "Тестовая подзадача 2", Status.NEW, 3));
+        fileBackedTaskManager.addTask(new Task("Задача 1", "Тестовая задача 1", Status.NEW, Duration.ofMinutes(25),
+                LocalDateTime.of(2025, 1, 1, 1, 0, 0, 0)));
+        fileBackedTaskManager.addEpic(new Epic("Эпик 1", "Тестовый эпик 1", Status.NEW, Duration.ofMinutes(25),
+                LocalDateTime.of(2025, 5, 2, 2, 0, 0, 0)));
+        fileBackedTaskManager.addSubTask(new SubTask("Подзадача 1", "Тестовая подзадача 1", Status.NEW, Duration.ofMinutes(25),
+                LocalDateTime.of(2025, 3, 3, 3, 0, 0, 0), 2));
+        fileBackedTaskManager.addSubTask(new SubTask("Подзадача 2", "Тестовая подзадача 2", Status.NEW, Duration.ofMinutes(25),
+                LocalDateTime.of(2025, 4, 4, 4, 0, 0, 0), 2));
+        fileBackedTaskManager.addTask(new Task("Задача 2", "Тестовая задача 2", Status.NEW, Duration.ofMinutes(25),
+                LocalDateTime.of(2025, 5, 1, 1, 0, 0, 0)));
 
-        FileBackedTaskManager fileBackedTaskManager1 = loadFromFile();
+        FileBackedTaskManager fileBackedTaskManagerFromFile = loadFromFile(new File(PATH_TO_FILE));
 
         System.out.println("Задача из менеджера - " + fileBackedTaskManager.getTaskList());
-        System.out.println("Задача из файла - " + fileBackedTaskManager1.getTaskList());
-        System.out.println("Задача из менеджера - " + fileBackedTaskManager.getEpicList());
-        System.out.println("Задача из файла - " + fileBackedTaskManager1.getEpicList());
-        System.out.println("Задача из менеджера - " + fileBackedTaskManager.getSubTaskList());
-        System.out.println("Задача из файла - " + fileBackedTaskManager1.getSubTaskList());
+        System.out.println("Задача из файла - " + fileBackedTaskManagerFromFile.getTaskList());
+        System.out.println("Эпик из менеджера - " + fileBackedTaskManager.getEpicList());
+        System.out.println("Эпик из файла - " + fileBackedTaskManagerFromFile.getEpicList());
+        System.out.println("Подзадача из менеджера - " + fileBackedTaskManager.getSubTaskList());
+        System.out.println("Подзадача из файла - " + fileBackedTaskManagerFromFile.getSubTaskList());
+
+        System.out.println("Sorted tasks");
+        System.out.println(fileBackedTaskManager.getPrioritizedTasks());
     }
 }

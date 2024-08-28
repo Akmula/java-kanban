@@ -6,6 +6,9 @@ import ru.yandex.javacource.isaev.schedule.tasks.Epic;
 import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static ru.yandex.javacource.isaev.schedule.enums.TaskType.*;
 
 public class CSVFormatter {
@@ -14,7 +17,7 @@ public class CSVFormatter {
     }
 
     public static String getHeader() {
-        return "id,type,title,description,status,epicId";
+        return "id,type,title,description,status,duration,startTime,epicId";
     }
 
     public static String toString(Task task) {
@@ -28,6 +31,8 @@ public class CSVFormatter {
                 task.getTitle() + "," +
                 task.getDescription() + "," +
                 task.getStatus() + "," +
+                task.getDuration() + "," +
+                task.getStartTime() + "," +
                 epicId;
     }
 
@@ -39,14 +44,16 @@ public class CSVFormatter {
         String title = split[2];
         String description = split[3];
         Status status = Status.valueOf(split[4]);
-        int epicId = Integer.parseInt(split[5]);
+        Duration duration = Duration.parse(split[5]);
+        LocalDateTime startTime = LocalDateTime.parse(split[6]);
+        int epicId = Integer.parseInt(split[7]);
 
         if (taskType.equals(EPIC)) {
-            task = new Epic(id, taskType, title, description, status);
+            task = new Epic(id, taskType, title, description, status, duration, startTime);
         } else if (taskType.equals(SUBTASK)) {
-            task = new SubTask(id, taskType, title, description, status, epicId);
+            task = new SubTask(id, taskType, title, description, status, duration, startTime, epicId);
         } else {
-            task = new Task(id, taskType, title, description, status);
+            task = new Task(id, taskType, title, description, status, duration, startTime);
         }
         return task;
     }
