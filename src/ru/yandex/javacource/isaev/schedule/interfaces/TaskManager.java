@@ -5,6 +5,7 @@ import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     List<Task> getTaskList();
@@ -39,9 +40,15 @@ public interface TaskManager {
 
     void deleteSubTask(int id);
 
-    void deleteSubtasks();
+    void deleteAllSubtask();
 
     SubTask getSubTask(int id);
 
     List<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
+
+    void addTaskToSet(Task task);
+
+    boolean isTimeIntersection(Task task);
 }
