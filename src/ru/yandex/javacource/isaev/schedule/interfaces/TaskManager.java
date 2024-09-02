@@ -5,7 +5,6 @@ import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.util.List;
-import java.util.Set;
 
 public interface TaskManager {
     List<Task> getTaskList();
@@ -46,9 +45,9 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    Set<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 
-    void addTaskToSet(Task task);
+    void addPrioritize(Task task);
 
     boolean isTimeIntersection(Task task);
 }

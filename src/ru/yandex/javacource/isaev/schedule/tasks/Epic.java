@@ -48,13 +48,9 @@ public class Epic extends Task {
         this.subTaskIdList.clear();
     }
 
-    public void setEndTime(Duration duration) {
-        if (duration == null) return;
-        if (this.endTime == null) {
-            this.endTime = getStartTime().plusMinutes(duration.toMinutes());
-        } else {
-            this.endTime = this.endTime.plusMinutes(duration.toMinutes());
-        }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+
     }
 
     @Override
@@ -66,7 +62,6 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "subTaskIdList=" + subTaskIdList +
-                ", endTime=" + endTime +
                 "} " + super.toString();
     }
 }

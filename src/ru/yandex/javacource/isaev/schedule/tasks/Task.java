@@ -123,7 +123,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return this.startTime.plusMinutes(this.duration.toMinutes());
+        return startTime.plusMinutes(duration.toMinutes());
     }
 
     @Override

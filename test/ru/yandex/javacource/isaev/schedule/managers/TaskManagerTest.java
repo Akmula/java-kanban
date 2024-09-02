@@ -11,7 +11,7 @@ import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.javacource.isaev.schedule.enums.Status.NEW;
@@ -106,10 +106,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void checkingTheAdditionOfTasksToTheSortedList() { // проверка добавления задач в сортированный список
-        Set<Task> tasks = taskManager.getPrioritizedTasks();
+        List<Task> tasks = taskManager.getPrioritizedTasks();
         Task verificationTask = new Task("Проверочная задача", "Описание проверочной задачи", NEW,
                 Duration.ofMinutes(15),
-                LocalDateTime.of(2007, 1, 1, 0, 0, 0, 0));
+                LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0));
         taskManager.addTask(verificationTask);
 
         assertEquals(tasks, taskManager.getPrioritizedTasks(), "Список не совпадает, задача добавлена!");
