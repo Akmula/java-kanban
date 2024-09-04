@@ -39,9 +39,15 @@ public interface TaskManager {
 
     void deleteSubTask(int id);
 
-    void deleteSubtasks();
+    void deleteAllSubtask();
 
     SubTask getSubTask(int id);
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
+
+    void addPrioritize(Task task);
+
+    boolean isTimeIntersection(Task task);
 }
