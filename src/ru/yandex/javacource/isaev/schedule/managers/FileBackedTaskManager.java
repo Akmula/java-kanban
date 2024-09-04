@@ -48,8 +48,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() { // сохранение задачи
         List<Task> tasks = getTaskList();
-        if (getEpicList() != null) tasks.addAll(getEpicList());
-        if (getSubTaskList() != null) tasks.addAll(getSubTaskList());
+        if (getEpicList() != null) {
+            tasks.addAll(getEpicList());
+        }
+        if (getSubTaskList() != null) {
+            tasks.addAll(getSubTaskList());
+        }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.valueOf(file), StandardCharsets.UTF_8))) {
             bw.write(CSVFormatter.getHeader());
             bw.newLine();

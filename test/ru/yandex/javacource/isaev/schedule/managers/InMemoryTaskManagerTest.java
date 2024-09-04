@@ -222,9 +222,13 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
 
         taskManager.deleteTask(task.getId());
         taskId2.setDuration(Duration.ofMinutes(16));
-        taskManager.addTask(task);
 
-        assertNull(taskManager.getTask(task.getId()), "Задача 3 не должна быть добавлена!");
+        Exception exception = assertThrows(RuntimeException.class, () -> taskManager.addTask(task));
+
+        String expectedMessage = "Задача не добавлена, на это время назначена задача!";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
 
         task.setStartTime(LocalDateTime.of(2000, 1, 1, 0, 31, 0, 0));
         taskManager.addTask(task);
