@@ -63,7 +63,7 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
         TaskManager taskManagerTest = Managers.getDefault();
         HistoryManager historyManagerTest = Managers.getDefaultHistory();
 
-        assertInstanceOf(InMemoryTaskManager.class, taskManagerTest, "Класс не инициализирован!");
+        assertInstanceOf(FileBackedTaskManager.class, taskManagerTest, "Класс не инициализирован!");
         assertInstanceOf(HistoryManager.class, historyManagerTest, "Класс не инициализирован!");
     }
 
