@@ -33,7 +33,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                boolean newFile = file.createNewFile();
             } catch (IOException e) {
                 throw new ManagerLoadException("Файл не существует!", new RuntimeException());
             }
