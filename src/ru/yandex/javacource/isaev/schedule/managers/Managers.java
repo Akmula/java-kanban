@@ -12,8 +12,7 @@ public class Managers {
 
     public static TaskManager getDefault() {
         final String PATH_TO_FILE = "src/ru/yandex/javacource/isaev/schedule/resources/data.csv";
-        File file = new File(PATH_TO_FILE);
-        return FileBackedTaskManager.loadFromFile(file);
+        return FileBackedTaskManager.loadFromFile(new File(PATH_TO_FILE));
     }
 
     public static HistoryManager getDefaultHistory() {

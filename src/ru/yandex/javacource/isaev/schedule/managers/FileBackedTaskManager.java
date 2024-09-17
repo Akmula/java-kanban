@@ -30,29 +30,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         int maxId = 0;
 
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-
         if (!file.exists()) {
             try {
-                boolean newFile = file.createNewFile();
+                if (file.createNewFile()) {
+                    List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+                    for (int i = 1; i < lines.size(); i++) {
+                        Task task = CSVFormatter.fromString(lines.get(i));
+                        if (task == null) {
+                            return null;
+                        }
+                        if (maxId < task.getId()) {
+                            maxId = task.getId();
+                        }
+                        fileBackedTaskManager.addAnyTask(task);
+                    }
+                }
             } catch (IOException e) {
-                throw new ManagerLoadException("Файл не существует!", new RuntimeException());
+                throw new ManagerLoadException("Ошибка чтения файла!", e);
             }
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-            for (int i = 1; i < lines.size(); i++) {
-                Task task = CSVFormatter.fromString(lines.get(i));
-                if (task == null) {
-                    return null;
-                }
-                if (maxId < task.getId()) {
-                    maxId = task.getId();
-                }
-                fileBackedTaskManager.addAnyTask(task);
-            }
-        } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка чтения файла!", e);
         }
         fileBackedTaskManager.setGeneratorId(maxId);
         return fileBackedTaskManager;
