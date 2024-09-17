@@ -2,6 +2,7 @@ package ru.yandex.javacource.isaev.schedule.managers;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacource.isaev.schedule.enums.Status;
+import ru.yandex.javacource.isaev.schedule.exceptions.NotFoundException;
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
 import ru.yandex.javacource.isaev.schedule.tasks.Epic;
@@ -82,9 +83,7 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
         final int id = epicId4.getId();
         epicId4.setDescription("Удаленный эпик");
         taskManager.deleteEpic(id);
-        taskManager.updateEpic(epicId4);
-        Epic deletedEpic = taskManager.getEpic(id);
-        taskManager.deleteEpic(id);
+
         SubTask subTask1 = new SubTask("Подзадача 1", "Тестовая подзадача 1", NEW, epicId3.getId());
         taskManager.addSubTask(subTask1);
         Epic updateEpic = new Epic(epicId3.getId(),
@@ -100,8 +99,9 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
         Epic statusEpic = taskManager.getEpic(updateEpic.getId());
         Status status2 = statusEpic.getStatus();
 
+        assertThrows(NotFoundException.class, () -> taskManager.updateEpic(epicId4));
+        assertThrows(NotFoundException.class, () ->  taskManager.deleteEpic(id));
         assertEquals(IN_PROGRESS, status2, "Статус эпика не поменялся.");
-        assertNull(deletedEpic, "Эпик не удален и обновлен.");
     }
 
     // добавление задач в историю просмотров
