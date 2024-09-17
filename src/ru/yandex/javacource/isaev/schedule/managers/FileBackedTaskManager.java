@@ -29,11 +29,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         int maxId = 0;
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка чтения файла!", e);
-        }
+
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
         try {
