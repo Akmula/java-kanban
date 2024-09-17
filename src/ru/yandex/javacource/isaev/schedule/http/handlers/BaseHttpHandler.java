@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public abstract class BaseHttpHandler implements HttpHandler {
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
+
+    protected void sendText(HttpExchange exchange, String text, int rCode) throws IOException {
         byte[] response = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(200, response.length);
+        exchange.sendResponseHeaders(rCode, response.length);
         exchange.getResponseBody().write(response);
         exchange.close();
     }
@@ -23,6 +24,13 @@ public abstract class BaseHttpHandler implements HttpHandler {
         exchange.close();
     }
 
+    protected void sendHasInteractions(HttpExchange exchange, String text, int rCode) throws IOException {
+        byte[] response = text.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        exchange.sendResponseHeaders(rCode, response.length);
+        exchange.getResponseBody().write(response);
+        exchange.close();
+    }
 
     protected Integer getIdFromPath(String path) {
         String[] parts = path.split("/");
@@ -31,4 +39,4 @@ public abstract class BaseHttpHandler implements HttpHandler {
         }
         return null;
     }
- }
+}

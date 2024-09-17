@@ -28,12 +28,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         int maxId = 0;
+
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new ManagerLoadException("Файл не существует!", new RuntimeException());
+            }
+        }
 
         try {
             List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             for (int i = 1; i < lines.size(); i++) {
                 Task task = CSVFormatter.fromString(lines.get(i));
+                if (task == null) {
+                    return null;
+                }
                 if (maxId < task.getId()) {
                     maxId = task.getId();
                 }
@@ -71,14 +83,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         switch (task.getTaskType()) {
             case TASK:
                 tasks.put(id, task);
-                prioritizedTasks.add(task);
+                if (task.getStartTime() != null) {
+                    prioritizedTasks.add(task);
+                }
                 break;
             case SUBTASK:
                 subTasks.put(id, (SubTask) task);
                 break;
             case EPIC:
                 epics.put(id, (Epic) task);
-                prioritizedTasks.add(task);
+                if (task.getStartTime() != null) {
+                    prioritizedTasks.add(task);
+                }
                 break;
         }
     }
@@ -175,6 +191,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager fileBackedTaskManagerFromFile = loadFromFile(new File(PATH_TO_FILE));
 
         System.out.println("Задача из менеджера - " + fileBackedTaskManager.getTaskList());
+        assert fileBackedTaskManagerFromFile != null;
         System.out.println("Задача из файла - " + fileBackedTaskManagerFromFile.getTaskList());
         System.out.println("Эпик из менеджера - " + fileBackedTaskManager.getEpicList());
         System.out.println("Эпик из файла - " + fileBackedTaskManagerFromFile.getEpicList());

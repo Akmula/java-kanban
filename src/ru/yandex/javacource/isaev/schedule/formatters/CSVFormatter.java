@@ -8,6 +8,7 @@ import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static ru.yandex.javacource.isaev.schedule.enums.TaskType.*;
 
@@ -39,21 +40,34 @@ public class CSVFormatter {
     public static Task fromString(String string) {
         Task task;
         String[] split = string.split(",");
+        if (split.length == 0) {
+            return null;
+        }
         int id = Integer.parseInt(split[0]);
         TaskType taskType = valueOf(split[1]);
         String title = split[2];
         String description = split[3];
         Status status = Status.valueOf(split[4]);
-        Duration duration = Duration.parse(split[5]);
-        LocalDateTime startTime = LocalDateTime.parse(split[6]);
         int epicId = Integer.parseInt(split[7]);
 
-        if (taskType.equals(EPIC)) {
-            task = new Epic(id, taskType, title, description, status, duration, startTime);
-        } else if (taskType.equals(SUBTASK)) {
-            task = new SubTask(id, taskType, title, description, status, duration, startTime, epicId);
+        if (split[5].equals("null") || split[6].equals("null")) {
+            if (taskType.equals(EPIC)) {
+                task = new Epic(id, taskType, title, description, status);
+            } else if (taskType.equals(SUBTASK)) {
+                task = new SubTask(id, taskType, title, description, status, epicId);
+            } else {
+                task = new Task(id, taskType, title, description, status);
+            }
         } else {
-            task = new Task(id, taskType, title, description, status, duration, startTime);
+            Duration duration = Duration.parse(Objects.requireNonNull(split[5]));
+            LocalDateTime startTime = LocalDateTime.parse(split[6]);
+            if (taskType.equals(EPIC)) {
+                task = new Epic(id, taskType, title, description, status, duration, startTime);
+            } else if (taskType.equals(SUBTASK)) {
+                task = new SubTask(id, taskType, title, description, status, duration, startTime, epicId);
+            } else {
+                task = new Task(id, taskType, title, description, status, duration, startTime);
+            }
         }
         return task;
     }

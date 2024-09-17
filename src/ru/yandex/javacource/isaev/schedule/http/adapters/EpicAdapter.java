@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.enums.TaskType;
-import ru.yandex.javacource.isaev.schedule.tasks.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.Epic;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -17,53 +17,59 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class TaskAdapter extends TypeAdapter<Task> {
+public class EpicAdapter extends TypeAdapter<Epic> {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     @Override
-    public void write(final JsonWriter jsonWriter, Task task) throws IOException {
+    public void write(final JsonWriter jsonWriter, Epic epic) throws IOException {
         jsonWriter.beginObject();
 
-        if (doesObjectContainField(task, "id")) {
+        if (doesObjectContainField(epic, "id")) {
             jsonWriter.name("id").nullValue();
         } else {
-            if (task.toString().contains("'id='null'")) {
+            if (epic.toString().contains("'id='null'")) {
                 jsonWriter.name("id").nullValue();
             } else {
-                jsonWriter.name("id").value(task.getId());
+                jsonWriter.name("id").value(epic.getId());
             }
         }
 
-        if (doesObjectContainField(task, "taskType")) {
-            if (task.getTaskType() == null) {
+        if (doesObjectContainField(epic, "taskType")) {
+            if (epic.getTaskType() == null) {
                 jsonWriter.name("taskType").nullValue();
             }
         } else {
-            jsonWriter.name("taskType").value(String.valueOf(task.getTaskType()));
+            jsonWriter.name("taskType").value(String.valueOf(epic.getTaskType()));
         }
 
-        jsonWriter.name("title").value(task.getTitle());
-        jsonWriter.name("description").value(task.getDescription());
-        jsonWriter.name("status").value(task.getStatus().toString());
+        jsonWriter.name("title").value(epic.getTitle());
+        jsonWriter.name("description").value(epic.getDescription());
+        jsonWriter.name("status").value(epic.getStatus().toString());
 
-        if (doesObjectContainField(task, "startTime")) {
+        if (doesObjectContainField(epic, "startTime")) {
             jsonWriter.name("duration").nullValue();
             jsonWriter.name("startTime").nullValue();
         } else {
-            if (task.getStartTime() == null) {
+            if (epic.getStartTime() == null) {
                 jsonWriter.name("duration").nullValue();
                 jsonWriter.name("startTime").nullValue();
             } else {
-                jsonWriter.name("duration").value(task.getDuration().toMinutes());
-                jsonWriter.name("startTime").value(task.getStartTime().format(DATE_TIME_FORMATTER));
+                jsonWriter.name("duration").value(epic.getDuration().toMinutes());
+                jsonWriter.name("startTime").value(epic.getStartTime().format(DATE_TIME_FORMATTER));
+            }
+        }
+
+        if (!doesObjectContainField(epic, "subTaskIdList")) {
+            if (epic.getSubTaskIdList() != null || !epic.getSubTaskIdList().isEmpty()) {
+                jsonWriter.name("subTaskIdList").value(String.valueOf(epic.getSubTaskIdList()));
             }
         }
         jsonWriter.endObject();
     }
 
     @Override
-    public Task read(JsonReader jsonReader) {
+    public Epic read(JsonReader jsonReader) {
         JsonElement jsonElement = JsonParser.parseReader(jsonReader);
         JsonObject json = null;
 
@@ -75,9 +81,10 @@ public class TaskAdapter extends TypeAdapter<Task> {
         }
 
         int id = 0;
-
-        if (json != null && json.has("id") && !json.get("id").isJsonNull()) {
-            id = json.get("id").getAsInt();
+        if (json != null && json.has("id")) {
+            if (!json.get("id").isJsonNull()) {
+                id = json.get("id").getAsInt();
+            }
         }
 
         String title = json != null ? json.get("title").getAsString() : null;
@@ -95,7 +102,7 @@ public class TaskAdapter extends TypeAdapter<Task> {
 
         Status status = Status.valueOf(Objects.requireNonNull(json).get("status").getAsString());
 
-        return new Task(id, TaskType.TASK, title, description, status, duration, startTime);
+        return new Epic(id, TaskType.EPIC, title, description, status, duration, startTime);
     }
 
     public boolean doesObjectContainField(Object object, String fieldName) {

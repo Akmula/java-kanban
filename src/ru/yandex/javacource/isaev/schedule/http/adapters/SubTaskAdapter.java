@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.enums.TaskType;
-import ru.yandex.javacource.isaev.schedule.tasks.Task;
+import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -17,53 +17,56 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class TaskAdapter extends TypeAdapter<Task> {
+public class SubTaskAdapter extends TypeAdapter<SubTask> {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     @Override
-    public void write(final JsonWriter jsonWriter, Task task) throws IOException {
+    public void write(final JsonWriter jsonWriter, SubTask subTask) throws IOException {
         jsonWriter.beginObject();
 
-        if (doesObjectContainField(task, "id")) {
+        if (doesObjectContainField(subTask, "id")) {
             jsonWriter.name("id").nullValue();
         } else {
-            if (task.toString().contains("'id='null'")) {
+            if (subTask.toString().contains("'id='null'")) {
                 jsonWriter.name("id").nullValue();
             } else {
-                jsonWriter.name("id").value(task.getId());
+                jsonWriter.name("id").value(subTask.getId());
             }
         }
 
-        if (doesObjectContainField(task, "taskType")) {
-            if (task.getTaskType() == null) {
+        if (doesObjectContainField(subTask, "taskType")) {
+            if (subTask.getTaskType() == null) {
                 jsonWriter.name("taskType").nullValue();
             }
         } else {
-            jsonWriter.name("taskType").value(String.valueOf(task.getTaskType()));
+            jsonWriter.name("taskType").value(String.valueOf(subTask.getTaskType()));
         }
 
-        jsonWriter.name("title").value(task.getTitle());
-        jsonWriter.name("description").value(task.getDescription());
-        jsonWriter.name("status").value(task.getStatus().toString());
+        jsonWriter.name("title").value(subTask.getTitle());
+        jsonWriter.name("description").value(subTask.getDescription());
+        jsonWriter.name("status").value(subTask.getStatus().toString());
 
-        if (doesObjectContainField(task, "startTime")) {
+        if (doesObjectContainField(subTask, "startTime")) {
             jsonWriter.name("duration").nullValue();
             jsonWriter.name("startTime").nullValue();
         } else {
-            if (task.getStartTime() == null) {
+            if (subTask.getStartTime() == null) {
                 jsonWriter.name("duration").nullValue();
                 jsonWriter.name("startTime").nullValue();
             } else {
-                jsonWriter.name("duration").value(task.getDuration().toMinutes());
-                jsonWriter.name("startTime").value(task.getStartTime().format(DATE_TIME_FORMATTER));
+                jsonWriter.name("duration").value(subTask.getDuration().toMinutes());
+                jsonWriter.name("startTime").value(subTask.getStartTime().format(DATE_TIME_FORMATTER));
             }
         }
+
+        jsonWriter.name("epicId").value(subTask.getEpicId());
+
         jsonWriter.endObject();
     }
 
     @Override
-    public Task read(JsonReader jsonReader) {
+    public SubTask read(JsonReader jsonReader) {
         JsonElement jsonElement = JsonParser.parseReader(jsonReader);
         JsonObject json = null;
 
@@ -75,7 +78,6 @@ public class TaskAdapter extends TypeAdapter<Task> {
         }
 
         int id = 0;
-
         if (json != null && json.has("id") && !json.get("id").isJsonNull()) {
             id = json.get("id").getAsInt();
         }
@@ -85,6 +87,8 @@ public class TaskAdapter extends TypeAdapter<Task> {
         Duration duration = null;
         LocalDateTime startTime = null;
 
+        int epicId = 0;
+
         if (json != null && json.has("duration") && !json.get("duration").isJsonNull()) {
             duration = Duration.ofMinutes(json.get("duration").getAsInt());
         }
@@ -93,9 +97,13 @@ public class TaskAdapter extends TypeAdapter<Task> {
             startTime = LocalDateTime.parse(json.get("startTime").getAsString(), DATE_TIME_FORMATTER);
         }
 
+        if (json != null && json.has("epicId") && !json.get("epicId").isJsonNull()) {
+            epicId = json.get("epicId").getAsInt();
+        }
+
         Status status = Status.valueOf(Objects.requireNonNull(json).get("status").getAsString());
 
-        return new Task(id, TaskType.TASK, title, description, status, duration, startTime);
+        return new SubTask(id, TaskType.SUBTASK, title, description, status, duration, startTime, epicId);
     }
 
     public boolean doesObjectContainField(Object object, String fieldName) {
