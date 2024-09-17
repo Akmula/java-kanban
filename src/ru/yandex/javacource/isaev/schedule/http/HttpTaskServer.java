@@ -3,6 +3,7 @@ package ru.yandex.javacource.isaev.schedule.http;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
+import ru.yandex.javacource.isaev.schedule.enums.Status;
 import ru.yandex.javacource.isaev.schedule.http.adapters.LocalDateTimeAdapter;
 import ru.yandex.javacource.isaev.schedule.http.adapters.TaskAdapter;
 import ru.yandex.javacource.isaev.schedule.http.handlers.TaskHandler;
@@ -13,6 +14,7 @@ import ru.yandex.javacource.isaev.schedule.tasks.Task;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -38,14 +40,16 @@ public class HttpTaskServer {
 
     public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-       // gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
+        gsonBuilder.serializeNulls();
+       gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+      //  gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         return gsonBuilder.create();
 
     }
 
     public static void main(String[] args) throws IOException {
+
         TaskManager taskManager = Managers.getDefault();
         HttpTaskServer httpTaskServer = new HttpTaskServer(taskManager);
         httpTaskServer.serverStart();
