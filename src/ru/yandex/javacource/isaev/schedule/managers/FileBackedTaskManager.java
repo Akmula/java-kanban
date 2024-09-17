@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final String PATH_TO_FILE = "src/ru/yandex/javacource/isaev/schedule/resources/data.csv";
@@ -28,28 +29,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         int maxId = 0;
-
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-        if (!file.exists()) {
-            try {
-                if (file.createNewFile()) {
-                    List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-                    for (int i = 1; i < lines.size(); i++) {
-                        Task task = CSVFormatter.fromString(lines.get(i));
-                        if (task == null) {
-                            return null;
-                        }
-                        if (maxId < task.getId()) {
-                            maxId = task.getId();
-                        }
-                        fileBackedTaskManager.addAnyTask(task);
-                    }
-                }
-            } catch (IOException e) {
-                throw new ManagerLoadException("Ошибка чтения файла!", e);
-            }
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка чтения файла!", e);
         }
-        fileBackedTaskManager.setGeneratorId(maxId);
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+
+        try {
+            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+            for (int i = 1; i < lines.size(); i++) {
+                Task task = CSVFormatter.fromString(lines.get(i));
+                if (task == null) {
+                    return null;
+                }
+                if (maxId < task.getId()) {
+                    maxId = task.getId();
+                }
+                Objects.requireNonNull(fileBackedTaskManager).addAnyTask(task);
+            }
+
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка чтения файла!", e);
+        }
+
+        Objects.requireNonNull(fileBackedTaskManager).setGeneratorId(maxId);
         return fileBackedTaskManager;
     }
 

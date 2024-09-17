@@ -63,7 +63,7 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
         TaskManager taskManagerTest = Managers.getDefault();
         HistoryManager historyManagerTest = Managers.getDefaultHistory();
 
-        assertInstanceOf(FileBackedTaskManager.class, taskManagerTest, "Класс не инициализирован!");
+        assertInstanceOf(InMemoryTaskManager.class, taskManagerTest, "Класс не инициализирован!");
         assertInstanceOf(HistoryManager.class, historyManagerTest, "Класс не инициализирован!");
     }
 
@@ -100,7 +100,7 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
         Status status2 = statusEpic.getStatus();
 
         assertThrows(NotFoundException.class, () -> taskManager.updateEpic(epicId4));
-        assertThrows(NotFoundException.class, () ->  taskManager.deleteEpic(id));
+        assertThrows(NotFoundException.class, () -> taskManager.deleteEpic(id));
         assertEquals(IN_PROGRESS, status2, "Статус эпика не поменялся.");
     }
 

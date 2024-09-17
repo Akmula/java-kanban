@@ -8,21 +8,25 @@ import ru.yandex.javacource.isaev.schedule.http.adapters.SubTaskAdapter;
 import ru.yandex.javacource.isaev.schedule.http.adapters.TaskAdapter;
 import ru.yandex.javacource.isaev.schedule.http.handlers.*;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
+import ru.yandex.javacource.isaev.schedule.managers.FileBackedTaskManager;
 import ru.yandex.javacource.isaev.schedule.managers.Managers;
 import ru.yandex.javacource.isaev.schedule.tasks.Epic;
 import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 import ru.yandex.javacource.isaev.schedule.tasks.Task;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class HttpTaskServer {
+    private static final String PATH_TO_FILE = "src/ru/yandex/javacource/isaev/schedule/resources/data.csv";
     private static final int PORT = 8080;
     private static final String HOSTNAME = "localhost";
     private final HttpServer httpServer;
 
     public HttpTaskServer(TaskManager taskManager) throws IOException {
         Managers.getDefaultHistory();
+        FileBackedTaskManager.loadFromFile(new File(PATH_TO_FILE));
         this.httpServer = HttpServer.create(new InetSocketAddress(HOSTNAME, PORT), 0);
         this.httpServer.createContext("/tasks", new TaskHandler(taskManager));
         this.httpServer.createContext("/epics", new EpicHandler(taskManager));
