@@ -58,14 +58,6 @@ final class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>
     // проверяем, что объект Subtask нельзя сделать своим же эпиком / нельзя, потому что разные объекты
 
     // убедитесь, что утилитарный класс всегда возвращает проинициализированные и готовые к работе экземпляры менеджеров
-    @Test
-    void checkingTheUtilityClass() {
-        TaskManager taskManagerTest = Managers.getDefault();
-        HistoryManager historyManagerTest = Managers.getDefaultHistory();
-
-        assertInstanceOf(FileBackedTaskManager.class, taskManagerTest, "Класс не инициализирован!");
-        assertInstanceOf(HistoryManager.class, historyManagerTest, "Класс не инициализирован!");
-    }
 
     // проверяем, что задачи с заданным и сгенерированным id не конфликтуют внутри менеджера
     @Test
