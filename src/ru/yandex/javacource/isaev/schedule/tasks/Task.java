@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
     private Integer id;
     private TaskType taskType;
     private String title;
@@ -126,16 +126,24 @@ public class Task {
         return startTime.plusMinutes(duration.toMinutes());
     }
 
+    private String durationToString(Duration duration) {
+        return duration != null ? String.valueOf(duration.toMinutes()) : "";
+    }
+
+    private String timeToString(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.format(DATE_TIME_FORMATTER) : "";
+    }
+
     @Override
     public String toString() {
         return "Task{'" +
-                "id='" + id +
-                ", taskType='" + taskType +
+                "id='" + id + '\'' +
+                ", taskType='" + taskType + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
-                ", duration='" + duration.toMinutes() + '\'' +
-                ", startTime='" + startTime.format(dateTimeFormatter) + '\'' +
+                ", duration='" + durationToString(duration) + '\'' +
+                ", startTime='" + timeToString(startTime) + '\'' +
                 '}' + '\n';
     }
 

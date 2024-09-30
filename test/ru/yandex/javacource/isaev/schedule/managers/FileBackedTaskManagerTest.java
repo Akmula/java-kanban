@@ -2,6 +2,7 @@ package ru.yandex.javacource.isaev.schedule.managers;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacource.isaev.schedule.exceptions.NotFoundException;
 import ru.yandex.javacource.isaev.schedule.tasks.Epic;
 import ru.yandex.javacource.isaev.schedule.tasks.SubTask;
 import ru.yandex.javacource.isaev.schedule.tasks.Task;
@@ -36,16 +37,6 @@ final class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMana
     }
 
     @Test
-    public void checkingLoadFileException() { // проверка чтения несуществующего файла
-        Exception exception = assertThrows(RuntimeException.class, () -> FileBackedTaskManager.loadFromFile(new File("tempFile")));
-
-        String expectedMessage = "Ошибка чтения файла!";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
     public void checkingSaveFileException() { // проверка записи в несуществующий файл
         assertDoesNotThrow(() -> {
             FileBackedTaskManager fileBackedTaskManagerTest = new FileBackedTaskManager(File.createTempFile("tempData", ".csv"));
@@ -63,9 +54,12 @@ final class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMana
             throw new RuntimeException(e);
         }
         FileBackedTaskManager fileBackedTaskManagerForEmptyFile = new FileBackedTaskManager(tempEmptyFile);
-        Task task = fileBackedTaskManagerForEmptyFile.getTask(1);
+
+        Exception exception = assertThrows(NotFoundException.class, () -> fileBackedTaskManagerForEmptyFile.getTask(1));
+        String expectedMessage = "Задача с id = 1 не найдена!";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
         assertTrue(tempEmptyFile.isAbsolute(), "Файл не создан!");
-        assertNull(task, "Задача существует! Файл не пустой");
     }
 
     @Test

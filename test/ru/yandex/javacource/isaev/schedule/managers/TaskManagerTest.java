@@ -3,6 +3,7 @@ package ru.yandex.javacource.isaev.schedule.managers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacource.isaev.schedule.enums.TaskType;
+import ru.yandex.javacource.isaev.schedule.exceptions.NotFoundException;
 import ru.yandex.javacource.isaev.schedule.interfaces.HistoryManager;
 import ru.yandex.javacource.isaev.schedule.interfaces.TaskManager;
 import ru.yandex.javacource.isaev.schedule.tasks.Epic;
@@ -87,9 +88,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteEpic(epicId3.getId());
         taskManager.deleteSubTask(subTaskId6.getId());
 
-        assertNull(taskManager.getTask(taskId1.getId()), "Задача не удалена!");
-        assertNull(taskManager.getEpic(epicId3.getId()), "Эпик не удален!");
-        assertNull(taskManager.getSubTask(subTaskId6.getId()), "Подзадача не удалена!");
+
+        Exception exceptionTask = assertThrows(NotFoundException.class, () -> taskManager.getTask(taskId1.getId()));
+        String expectedMessageTask = "Задача с id = " + taskId1.getId() + " не найдена!";
+        String actualMessageTask = exceptionTask.getMessage();
+        assertTrue(actualMessageTask.contains(expectedMessageTask));
+
+        Exception exceptionEpic = assertThrows(NotFoundException.class, () -> taskManager.getEpic(epicId3.getId()));
+        String expectedMessageEpic = "Эпик с id = " + epicId3.getId() + " не найден!";
+        String actualMessageEpic = exceptionEpic.getMessage();
+        assertTrue(actualMessageEpic.contains(expectedMessageEpic));
+
+        Exception exceptionSubTask = assertThrows(NotFoundException.class, () -> taskManager.getSubTask(subTaskId6.getId()));
+        String expectedMessageSubTask = "Подзадача с id = " + subTaskId6.getId() + " не найдена!";
+        String actualMessageSubTask = exceptionSubTask.getMessage();
+        assertTrue(actualMessageSubTask.contains(expectedMessageSubTask));
     }
 
     @Test
